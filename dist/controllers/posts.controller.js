@@ -17,8 +17,8 @@ let PostsController = class PostsController {
         return stub_1.postsStub;
     }
     getOnePost(id) {
-        console.log(id.params);
-        return 'not implemented yet';
+        console.log(id);
+        return stub_1.postsStub.find(p => p.id == id);
     }
 };
 __decorate([

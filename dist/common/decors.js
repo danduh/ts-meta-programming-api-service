@@ -21,10 +21,17 @@ function createRouterDecorator(method) {
         }
         const routes = Reflect.getMetadata('routes', target);
         routes.push(route);
+        const routeParams = Reflect.getMetadata('routeParams', target);
+        let paramToInject;
+        if (routeParams) {
+            console.log(routeParams[propertyKey]);
+            paramToInject = routeParams[propertyKey];
+        }
         const ordinalMethod = descriptor.value;
         descriptor.value = (...args) => {
             let [request, response] = args;
-            const result = ordinalMethod.apply(this, args);
+            console.log(request.params[paramToInject]);
+            const result = ordinalMethod.apply(this, [request.params[paramToInject]]);
             console.log(result);
             response.send(result);
         };
@@ -32,11 +39,13 @@ function createRouterDecorator(method) {
 }
 exports.createRouterDecorator = createRouterDecorator;
 exports.Get = createRouterDecorator('get');
-function Param(propName) {
-    return (target, prpertyKey) => {
-        const routes = Reflect.getMetadata('routes', target);
-        console.log('GetX', routes);
-        console.log(target, prpertyKey, propName);
+function Param(paramName) {
+    return (target, propertyKey, index) => {
+        if (!Reflect.hasMetadata('routeParams', target)) {
+            Reflect.defineMetadata('routeParams', {}, target);
+        }
+        const routeParams = Reflect.getMetadata('routeParams', target);
+        routeParams[propertyKey] = paramName;
     };
 }
 exports.Param = Param;

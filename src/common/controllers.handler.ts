@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 import { Route } from './decors';
 import * as path from 'path';
+import { Application } from "express-serve-static-core";
 
-export function controllersHandler(controllers: any[], app) {
+export function controllersHandler(controllers: any[], app: Application) {
   console.log('controllersHandler', controllers);
   for (const controller of controllers) {
     const isController: boolean = Reflect.hasMetadata('basePath', controller);
