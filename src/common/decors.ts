@@ -39,7 +39,6 @@ export function createRouterDecorator(method: Method): RouterDecoratorFactory{
             const routes = Reflect.getMetadata('routes', target);
             routes.push(route);
 
-
             const routeParams = Reflect.getMetadata('routeParams', target);
             let paramToInject: string;
             if(routeParams) {
@@ -66,6 +65,7 @@ export const Get: RouterDecoratorFactory = createRouterDecorator('get');
 
 export function Param(paramName: string): any{
     return (target: Object, propertyKey: string, index: number) => {
+        console.log('IN PARAM', propertyKey)
         if (!Reflect.hasMetadata('routeParams', target)) {
             Reflect.defineMetadata('routeParams', {}, target);
         }
