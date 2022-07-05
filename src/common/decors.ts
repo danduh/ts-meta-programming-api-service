@@ -5,7 +5,7 @@ export type Method = 'get' | 'post';
 
 export interface Route {
   propertyKey: string;
-  method: Method;
+  httpMethod: Method;
   path: string;
 }
 
@@ -20,15 +20,17 @@ export type RouterDecoratorFactory = (path?: string) => MethodDecorator;
 
 /**
  * Create a route decorator factory
- * @param {string} method routing method('get', 'post' etc.)
+ * @param {string} httpMethod routing method('get', 'post' etc.)
  * @return {RouterDecoratorFactory} route decorator factory
  */
-export function createRouterDecorator(method: Method): RouterDecoratorFactory {
+export function createRouterDecorator(
+  httpMethod: Method
+): RouterDecoratorFactory {
   return (path?: string) =>
     (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
       const route: Route = {
         propertyKey,
-        method,
+        httpMethod,
         path: path || '',
       };
 
@@ -60,6 +62,7 @@ export function createRouterDecorator(method: Method): RouterDecoratorFactory {
 
 // Route decorator factory for method GET
 export const Get: RouterDecoratorFactory = createRouterDecorator('get');
+export const Post: RouterDecoratorFactory = createRouterDecorator('post');
 
 export function Param(paramName: string): any {
   return (target: Object, propertyKey: string, index: number) => {

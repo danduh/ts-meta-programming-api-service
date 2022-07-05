@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Route } from './decors';
 import * as path from 'path';
-import { Application } from "express-serve-static-core";
+import { Application } from 'express-serve-static-core';
 
 export function controllersHandler(controllers: any[], app: Application) {
   console.log('controllersHandler', controllers);
@@ -18,13 +18,17 @@ export function controllersHandler(controllers: any[], app: Application) {
         'routes',
         controller.prototype
       );
+
+      console.log(basePath);
+      console.log(routes);
+
       let curPath: string, curRouteHandler;
       routes.forEach((route: Route) => {
         curPath = path.posix.join('/', basePath, route.path);
         curRouteHandler = controller.prototype[route.propertyKey];
-        app[route.method](curPath, curRouteHandler);
+        app[route.httpMethod](curPath, curRouteHandler);
         console.info(
-          `router: ${controller.name}.${route.propertyKey} [${route.method}] ${curPath}`
+          `router: ${controller.name}.${route.propertyKey} [${route.httpMethod}] ${curPath}`
         );
       });
     }
