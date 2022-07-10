@@ -46,9 +46,11 @@ export function createRouterDecorator(
         let [request, response] = args;
         const argumentsToInject: any[] = [];
         // Params care
-        paramsToInject.forEach((param) => {
-          argumentsToInject[param.index] = request.params[param.paramName];
-        });
+        if (paramsToInject?.length > 0) {
+          paramsToInject.forEach((param) => {
+            argumentsToInject[param.index] = request.params[param.paramName];
+          });
+        }
         const result = ordinalMethod.apply(this, argumentsToInject); // @Param
         response.send(result);
       };
