@@ -42,19 +42,24 @@ export function createRouterDecorator(
       routes.push(route);
 
       // SKIP
-      const routeParams = Reflect.getMetadata('routeParams', target);
-      let paramToInject: string;
+      const routeParams: ParamRecord = Reflect.getMetadata(
+        'routeParams',
+        target
+      );
+      let paramsToInject: ParamType[];
       if (routeParams) {
-        paramToInject = routeParams[propertyKey];
+        paramsToInject = routeParams[propertyKey];
       }
-
       // LAST
       const ordinalMethod = descriptor.value;
       descriptor.value = (...args: [Request, Response]) => {
         let [request, response] = args;
-        const result = ordinalMethod.apply(this, [
-          request.params[paramToInject],
-        ]); // @Param
+        const argumentsToInject: any[] = [];
+        // Params care
+        paramsToInject.forEach((param) => {
+          argumentsToInject[param.index] = request.params[param.paramName];
+        });
+        const result = ordinalMethod.apply(this, argumentsToInject); // @Param
         response.send(result);
       };
     };
@@ -64,13 +69,26 @@ export function createRouterDecorator(
 export const Get: RouterDecoratorFactory = createRouterDecorator('get');
 export const Post: RouterDecoratorFactory = createRouterDecorator('post');
 
+interface ParamType {
+  index: number; // Argument's index the param should be injected
+  paramName: string; // Param name to lookup in Request Object
+}
+
+type ParamRecord = Record<string, ParamType[]>;
+
 export function Param(paramName: string): any {
-  return (target: Object, propertyKey: string, index: number) => {
-    console.log('IN PARAM', propertyKey);
+  return (target: Object, methodName: string, index: number) => {
+    const param: ParamType = {
+      paramName,
+      index,
+    };
+
     if (!Reflect.hasMetadata('routeParams', target)) {
       Reflect.defineMetadata('routeParams', {}, target);
     }
-    const routeParams = Reflect.getMetadata('routeParams', target);
-    routeParams[propertyKey] = paramName;
+    const routeParams: ParamRecord = Reflect.getMetadata('routeParams', target);
+    if (!routeParams.hasOwnProperty(methodName)) routeParams[methodName] = [];
+    // Class Method Name, where param should be injected in
+    routeParams[methodName].push(param);
   };
 }

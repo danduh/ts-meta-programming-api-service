@@ -3,27 +3,22 @@ import { postsStub } from '../stub';
 
 @Controller('/posts')
 export class PostsController {
-    @Get('')
-    getListPosts(){
-        return postsStub;
-    }
+  @Get('')
+  getListPosts() {
+    return postsStub;
+  }
 
-    @Get('/:id')
-    getOnePost(@Param('id') id: any){
-        return "not implemented"
-    }
+  @Get('/:postId')
+  getOnePost(@Param('postId') postId: any) {
+    console.log(postId); // log the ID from params
+    return 'not implemented';
+  }
+
+  @Get('/:postId/:comments')
+  getOnePost2(@Param('postId') postId: any, @Param('comments') comments: any) {
+    console.log('getOnePost2', postId, comments); // log the ID from params
+    return 'not implementedss';
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 // return postsStub.find(p => p.id === id);
